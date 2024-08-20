@@ -2,10 +2,13 @@ pipeline {
     agent any
 
     environment {
-        GIT_REPO = 'http://gitea.okestro.io/student/front-end-haho.git' // Gitea Repository URL
-        DOCKER_REGISTRY = 'harbor.okestro.io' // Harbor Registry URL
-        IMAGE_NAME = 'student/front-end-haho' // 이미지 이름 (Harbor에 저장될 이름)
-        KUBE_NAMESPACE = 'haho' // Kubernetes Namespace
+        GIT_REPO = 'http://gitea.okestro.io/student/front-end-haho.git'
+        DOCKER_REGISTRY = 'harbor.okestro.io'
+        IMAGE_NAME = 'student/front-end-haho'
+        KUBE_NAMESPACE = 'haho'
+        ARGOCD_APP_NAME = 'your-argo-app-name'  // 실제 ArgoCD 애플리케이션 이름으로 변경 필요
+        HARBOR_USERNAME = 'student'  // Harbor 사용자 이름
+        HARBOR_PASSWORD = 'Okestro2018!'  // Harbor 비밀번호
     }
 
     stages {
@@ -15,20 +18,19 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build Podman Image') {
             steps {
                 script {
-                    dockerImage = docker.build("${DOCKER_REGISTRY}/${IMAGE_NAME}:${env.BUILD_ID}")
+                    sh 'podman build -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${env.BUILD_ID} .'
                 }
             }
         }
 
-        stage('Push Docker Image to Harbor') {
+        stage('Push Podman Image to Harbor') {
             steps {
                 script {
-                    docker.withRegistry("https://${DOCKER_REGISTRY}", 'harbor-credentials') {
-                        dockerImage.push()
-                    }
+                    sh 'podman login -u ${HARBOR_USERNAME} -p ${HARBOR_PASSWORD} ${DOCKER_REGISTRY}'
+                    sh 'podman push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${env.BUILD_ID}'
                 }
             }
         }
@@ -37,7 +39,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                    argocd app set <your-argo-app-name> --values image.tag=${env.BUILD_ID} --sync
+                    argocd app set ${ARGOCD_APP_NAME} --values image.tag=${env.BUILD_ID} --sync
                     """
                 }
             }
