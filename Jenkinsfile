@@ -41,8 +41,8 @@ pipeline {
         stage('Push Docker Image to Harbor') {
             steps {
                 container('podman') {
-                    sh 'echo "${HARBOR_PASSWORD}" | podman login $DOCKER_REGISTRY -u "$HARBOR_USERNAME" --password-stdin'
-                    sh 'podman push $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME'
+                    sh 'echo "${HARBOR_PASSWORD}" | podman login $DOCKER_REGISTRY -u "$HARBOR_USERNAME" --password-stdin --tls-verify=false'
+                    sh 'podman push $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME --tls-verify=false'
                 }
             }
         }
