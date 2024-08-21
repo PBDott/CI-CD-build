@@ -5,7 +5,7 @@ pipeline {
             defaultContainer 'jnlp'
             containerTemplate {
                 name 'podman'
-                image 'podman/stable:latest'
+                image 'quay.io/podman/stable:latest'
                 ttyEnabled true
                 command 'cat'
             }
@@ -60,11 +60,10 @@ pipeline {
 
     post {
         success {
-            echo 'Build and push to Harbor success'
+            echo 'Build and push to Harbor successful'
         }
         failure {
             echo 'Build or push failed'
         }
     }
 }
-
