@@ -32,7 +32,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 container('podman') {
-                    sh 'podman build -t $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME -f ./Dockerfile .'
+                    sh 'podman --storage-driver vfs build -t $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME -f ./Dockerfile .'
                 }
             }
         }
