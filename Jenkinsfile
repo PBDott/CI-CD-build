@@ -14,7 +14,7 @@ pipeline {
     }
     environment {
         GIT_REPO = 'http://gitea-http.common.svc.cluster.local:3000/student/front-end-haho.git'
-        DOCKER_REGISTRY = 'harbor.common.svc.cluster.local'  // 또는 'harbor.harbor-namespace.svc.cluster.local'
+        DOCKER_REGISTRY = 'harbor-registry.common.svc.cluster.local:5000'  // 정확한 Harbor 서비스 이름 사용
         IMAGE_NAME = 'student/front-end-haho'
         HARBOR_USERNAME = 'student'
         HARBOR_PASSWORD = 'Okestro2018!'
@@ -41,8 +41,9 @@ pipeline {
         stage('Push Docker Image to Harbor') {
             steps {
                 container('podman') {
-                    sh 'echo "${HARBOR_PASSWORD}" | podman login $DOCKER_REGISTRY -u "$HARBOR_USERNAME" --password-stdin --tls-verify=false'
-                    sh 'podman push $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME --tls-verify=false'
+                    // 로그인 시도 시 HTTP로 명시
+                    sh 'echo "${HARBOR_PASSWORD}" | podman login http://$DOCKER_REGISTRY -u "$HARBOR_USERNAME" --password-stdin --tls-verify=false'
+                    sh 'podman push $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME'
                 }
             }
         }
