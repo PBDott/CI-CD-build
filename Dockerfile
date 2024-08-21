@@ -1,19 +1,18 @@
-FROM node:10-alpine
-ENV NODE_ENV="production"
-ENV PORT=8079
+# Node.js 14 버전을 기반으로 한 이미지
+FROM node:14
+
+# 작업 디렉터리 설정
+WORKDIR /app
+
+# 애플리케이션 의존성 설치
+COPY package*.json ./
+RUN npm install
+
+# 애플리케이션 소스 코드 복사
+COPY . .
+
+# 포트 노출
 EXPOSE 8079
-RUN addgroup mygroup && adduser -D -G mygroup myuser && mkdir -p /usr/src/app && chown -R myuser /usr/src/app
 
-# Prepare app directory
-WORKDIR /usr/src/app
-COPY package.json /usr/src/app/
-COPY yarn.lock /usr/src/app/
-RUN chown myuser /usr/src/app/yarn.lock
-
-USER myuser
-RUN yarn install
-
-COPY . /usr/src/app
-
-# Start the app
-CMD ["/usr/local/bin/npm", "start"]
+# 컨테이너 시작 시 실행할 명령어
+CMD ["node", "server.js"]
