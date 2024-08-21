@@ -60,10 +60,11 @@ pipeline {
 
     post {
         success {
-            echo 'Build and push to Harbor successful'
+            echo 'Build and push to Harbor success'
         }
         failure {
             echo 'Build or push failed'
         }
     }
 }
+
