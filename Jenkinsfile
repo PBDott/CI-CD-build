@@ -18,7 +18,7 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 container('git') {
-                    git branch: 'main', url: "${GIT_REPO}", credentialsId: "${GIT_CREDENTIAL_ID}"
+                    git branch: 'main', url: "${GIT_REPO}"
                 }
             }
         }
