@@ -14,7 +14,7 @@ pipeline {
     }
     environment {
         GIT_REPO = 'http://gitea-http.common.svc.cluster.local:3000/student/front-end-haho.git'
-        DOCKER_REGISTRY = 'https://harbor.okestro.io'
+        DOCKER_REGISTRY = 'harbor.okestro.io'
         IMAGE_NAME = 'student/front-end-haho'
         HARBOR_USERNAME = 'student'
         HARBOR_PASSWORD = 'Okestro2018!'
