@@ -3,6 +3,14 @@ pipeline {
         kubernetes {
             inheritFrom 'default'
             defaultContainer 'jnlp'
+            containers {
+                containerTemplate {
+                    name 'podman'
+                    image 'podman/stable:latest'
+                    ttyEnabled true
+                    command 'cat'
+                }
+            }
         }
     }
     environment {
