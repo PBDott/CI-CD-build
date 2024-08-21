@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        GIT_REPO = 'http://gitea.okestro.io/student/front-end-haho.git'
+        GIT_REPO = 'http://gitea-http.common.svc.cluster.local:3000/student/front-end-haho.git'
         DOCKER_REGISTRY = 'harbor.okestro.io'
         IMAGE_NAME = 'student/front-end-haho'
         KUBE_NAMESPACE = 'haho'
