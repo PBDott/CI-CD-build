@@ -1,63 +1,63 @@
 pipeline {
-    agent any
-
+    agent {
+        kubernetes {
+            inheritFrom 'default'
+            defaultContainer 'jnlp'
+        }
+    }
     environment {
         GIT_REPO = 'http://gitea-http.common.svc.cluster.local:3000/student/front-end-haho.git'
         DOCKER_REGISTRY = 'harbor.okestro.io'
         IMAGE_NAME = 'student/front-end-haho'
-        KUBE_NAMESPACE = 'haho'
-        ARGOCD_APP_NAME = 'your-argo-app-name'  // 실제 ArgoCD 애플리케이션 이름으로 변경 필요
-        HARBOR_USERNAME = 'student'  // Harbor 사용자 이름
-        HARBOR_PASSWORD = 'Okestro2018!'  // Harbor 비밀번호
+        HARBOR_USERNAME = 'student'
+        HARBOR_PASSWORD = 'Okestro2018!'
+        BUILD_NUMBER = "${env.BUILD_NUMBER}"
+        TAG_NAME = "SNAPSHOT-${BUILD_NUMBER}"
     }
-
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'main', url: "${GIT_REPO}"
-            }
-        }
-
-        stage('Build Podman Image') {
-            steps {
-                script {
-                    sh '''
-                    #!/bin/bash
-                    podman build -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${BUILD_ID} .
-                    '''
+                container('git') {
+                    git branch: 'main', url: "${GIT_REPO}", credentialsId: "${GIT_CREDENTIAL_ID}"
                 }
             }
         }
 
-        stage('Push Podman Image to Harbor') {
+        stage('Build Docker Image') {
             steps {
-                script {
-                    sh 'podman login -u ${HARBOR_USERNAME} -p ${HARBOR_PASSWORD} ${DOCKER_REGISTRY}'
-                    sh 'podman push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${env.BUILD_ID}'
+                container('podman') {
+                    sh 'podman build -t $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME -f ./Dockerfile .'
                 }
             }
         }
 
-        stage('Deploy to Kubernetes via ArgoCD') {
+        stage('Push Docker Image to Harbor') {
             steps {
-                script {
-                    sh """
-                    argocd app set ${ARGOCD_APP_NAME} --values image.tag=${env.BUILD_ID} --sync
-                    """
+                container('podman') {
+                    withCredentials([usernamePassword(credentialsId: "$DOCKER_CREDENTIAL_ID", passwordVariable: "DOCKER_PASSWORD", usernameVariable: "DOCKER_USERNAME")]) {
+                        sh 'echo "${DOCKER_PASSWORD}" | podman login $DOCKER_REGISTRY -u "$DOCKER_USERNAME" --password-stdin'
+                        sh 'podman push $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME'
+                    }
+                }
+            }
+        }
+
+        stage('Tag & Push Latest Docker Image') {
+            steps {
+                container('podman') {
+                    sh 'podman tag $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME $DOCKER_REGISTRY/$IMAGE_NAME:latest'
+                    sh 'podman push --tls-verify=false $DOCKER_REGISTRY/$IMAGE_NAME:latest'
                 }
             }
         }
     }
 
     post {
-        always {
-            cleanWs()
-        }
         success {
-            echo 'Deployment completed successfully.'
+            echo 'Build and push to Harbor successful'
         }
         failure {
-            echo 'Deployment failed.'
+            echo 'Build or push failed'
         }
     }
 }
