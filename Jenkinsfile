@@ -21,7 +21,10 @@ pipeline {
         stage('Build Podman Image') {
             steps {
                 script {
-                    sh 'podman build -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${env.BUILD_ID} .'
+                    sh '''
+                    #!/bin/bash
+                    podman build -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${BUILD_ID} .
+                    '''
                 }
             }
         }
