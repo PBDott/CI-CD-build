@@ -8,6 +8,7 @@ pipeline {
                 image 'quay.io/podman/stable:latest'
                 ttyEnabled true
                 command 'cat'
+                privileged true // Privileged 모드 활성화
             }
         }
     }
@@ -32,7 +33,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 container('podman') {
-                    sh 'podman --storage-driver vfs --userns=keep-id build -t $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME -f ./Dockerfile .'
+                    sh 'podman --storage-driver vfs build -t $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME -f ./Dockerfile .'
                 }
             }
         }
