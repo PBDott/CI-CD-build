@@ -14,7 +14,7 @@ pipeline {
     }
     environment {
         GIT_REPO = 'http://gitea-http.common.svc.cluster.local:3000/student/front-end-haho.git'
-        DOCKER_REGISTRY = 'harbor.okestro.io'
+        DOCKER_REGISTRY = 'harbor.common.svc.cluster.local'  // 또는 'harbor.harbor-namespace.svc.cluster.local'
         IMAGE_NAME = 'student/front-end-haho'
         HARBOR_USERNAME = 'student'
         HARBOR_PASSWORD = 'Okestro2018!'
@@ -33,7 +33,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 container('podman') {
-                    sh 'podman build -t $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME -f ./Dockerfile .'
+                    sh 'podman --storage-driver vfs build -t $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME -f ./Dockerfile .'
                 }
             }
         }
@@ -50,8 +50,8 @@ pipeline {
         stage('Tag & Push Latest Docker Image') {
             steps {
                 container('podman') {
-                    sh 'echo "${HARBOR_PASSWORD}" | podman login $DOCKER_REGISTRY -u "$HARBOR_USERNAME" --password-stdin'
-                    sh 'podman push $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME'
+                    sh 'podman tag $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME $DOCKER_REGISTRY/$IMAGE_NAME:latest'
+                    sh 'podman push --tls-verify=false $DOCKER_REGISTRY/$IMAGE_NAME:latest'
                 }
             }
         }
