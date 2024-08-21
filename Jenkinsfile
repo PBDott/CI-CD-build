@@ -8,7 +8,7 @@ pipeline {
                 image 'quay.io/podman/stable:latest'
                 ttyEnabled true
                 command 'cat'
-                privileged true // Privileged 모드 활성화
+                privileged true
             }
         }
     }
@@ -41,10 +41,8 @@ pipeline {
         stage('Push Docker Image to Harbor') {
             steps {
                 container('podman') {
-                    withCredentials([usernamePassword(credentialsId: "$DOCKER_CREDENTIAL_ID", passwordVariable: "DOCKER_PASSWORD", usernameVariable: "DOCKER_USERNAME")]) {
-                        sh 'echo "${DOCKER_PASSWORD}" | podman login $DOCKER_REGISTRY -u "$DOCKER_USERNAME" --password-stdin'
-                        sh 'podman push $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME'
-                    }
+                    sh 'echo "${HARBOR_PASSWORD}" | podman login $DOCKER_REGISTRY -u "$HARBOR_USERNAME" --password-stdin'
+                    sh 'podman push $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME'
                 }
             }
         }
