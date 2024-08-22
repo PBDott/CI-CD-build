@@ -42,7 +42,7 @@ pipeline {
             steps {
                 container('podman') {
                     sh '''
-                        echo 'Okestro2018!' | podman login --tls-verify=false http://harbor-registry.common.svc.cluster.local:5000 -u student --password-stdin
+                        "${HARBOR_PASSWORD}" | podman login $DOCKER_REGISTRY -u "$HARBOR_USERNAME" --password-stdin
                         podman push --tls-verify=false $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME
                     '''
                 }
