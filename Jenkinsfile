@@ -42,7 +42,7 @@ pipeline {
             steps {
                 container('podman') {
                     // 로그인 시도 시 HTTP로 명시
-                    sh 'echo "${HARBOR_PASSWORD}" | podman login http://$DOCKER_REGISTRY -u "$HARBOR_USERNAME" --password-stdin --tls-verify=false'
+                   sh 'echo "$HARBOR_PASSWORD" | podman login http://$DOCKER_REGISTRY -u "$HARBOR_USERNAME" --password-stdin --tls-verify=false'
                     sh 'podman push $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME'
                 }
             }
