@@ -42,7 +42,7 @@ pipeline {
             steps {
                 container('podman') {
                     sh '''
-                        echo 'Okestro2018!' | podman login https://harbor-registry.common.svc.cluster.local:5000 -u student --password-stdin
+                        echo 'Okestro2018!' | podman login http://harbor-registry.common.svc.cluster.local:5000 -u student --password-stdin
                         podman push $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME
                     '''
                 }
