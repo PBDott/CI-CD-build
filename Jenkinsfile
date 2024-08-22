@@ -42,7 +42,7 @@ pipeline {
             steps {
                 container('podman') {
                     sh '''
-                        "${HARBOR_PASSWORD}" | podman login $DOCKER_REGISTRY -u "$HARBOR_USERNAME" --password-stdin
+                        echo "${HARBOR_PASSWORD}" | podman login $DOCKER_REGISTRY -u "$HARBOR_USERNAME" --password-stdin --tls-verify=false
                         podman push --tls-verify=false $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME
                     '''
                 }
