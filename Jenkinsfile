@@ -14,7 +14,7 @@ pipeline {
     }
     environment {
         GIT_REPO = 'http://gitea-http.common.svc.cluster.local:3000/student/front-end-haho.git'
-        DOCKER_REGISTRY = 'harbor-registry.common.svc.cluster.local:5000'  // 정확한 Harbor 서비스 이름 사용
+        DOCKER_REGISTRY = 'harbor-registry.common.svc.cluster.local:5000'  
         IMAGE_NAME = 'student/front-end-haho'
         HARBOR_USERNAME = 'student'
         HARBOR_PASSWORD = 'Okestro2018!'
@@ -60,7 +60,7 @@ pipeline {
 
     post {
         success {
-            echo 'Build and push to Harbor successful'
+            echo 'Build and push to Harbor success'
         }
         failure {
             echo 'Build or push failed'
