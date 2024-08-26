@@ -45,8 +45,7 @@ pipeline {
                 container('podman') {
                     sh '''
                         podman login $DOCKER_REGISTRY_PORTAL -u $HARBOR_USERNAME -p $HARBOR_PASSWORD --tls-verify=false
-                        podman tag $DOCKER_REGISTRY_CORE/$IMAGE_NAME:$TAG_NAME $HARBOR_REGISTRY/$IMAGE_NAME:$TAG_NAME
-                        podman push $HARBOR_REGISTRY/$IMAGE_NAME:$TAG_NAME
+                        podman push $HARBOR_REGISTRY/$IMAGE_NAME:$TAG_NAME --tls-verify=false
                     '''
                 }
             }
@@ -56,8 +55,8 @@ pipeline {
             steps {
                 container('podman') {
                     sh '''
-                        podman tag $HARBOR_REGISTRY/$IMAGE_NAME:$TAG_NAME $HARBOR_REGISTRY/$IMAGE_NAME:latest
-                        podman push --tls-verify=false $HARBOR_REGISTRY/$IMAGE_NAME:latest
+                        podman tag $DOCKER_REGISTRY_CORE/$IMAGE_NAME:$TAG_NAME $HARBOR_REGISTRY/$IMAGE_NAME:$TAG_NAME
+                        podman push $HARBOR_REGISTRY/$IMAGE_NAME:$TAG_NAME --tls-verify=false
                     '''
                 }
             }
