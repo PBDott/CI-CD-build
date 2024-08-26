@@ -16,7 +16,7 @@ pipeline {
         GIT_REPO = 'http://gitea-http.common.svc.cluster.local:3000/student/front-end-haho.git'
         DOCKER_REGISTRY_PORTAL = 'harbor-portal.common.svc.cluster.local:80'
         DOCKER_REGISTRY_CORE = 'harbor-core.common.svc.cluster.local:80'
-        IMAGE_NAME = 'student/front-end-haho'
+        IMAGE_NAME = 'front-end-haho'
         HARBOR_REGISTRY = 'harbor.okestro.io/front-end-haho'
         HARBOR_USERNAME = 'student'
         HARBOR_PASSWORD = 'Okestro2018!'
@@ -49,7 +49,7 @@ pipeline {
                 container('podman') {
                     sh '''
                         podman login $DOCKER_REGISTRY_PORTAL -u $HARBOR_USERNAME -p $HARBOR_PASSWORD --tls-verify=false
-                        podman push $HARBOR_REGISTRY_CORE/$IMAGE_NAME:$TAG_NAME --tls-verify=false
+                        podman push $HARBOR_REGISTRY/$IMAGE_NAME:$TAG_NAME --tls-verify=false
                     '''
                 }
             }
@@ -59,8 +59,8 @@ pipeline {
             steps {
                 container('podman') {
                     sh '''
-                        podman tag $DOCKER_REGISTRY_CORE/$IMAGE_NAME:$TAG_NAME $HARBOR_REGISTRY/$IMAGE_NAME:$TAG_NAME
-                        podman push $HARBOR_REGISTRY/$IMAGE_NAME:$TAG_NAME --tls-verify=false
+                        podman tag $HARBOR_REGISTRY/$IMAGE_NAME:$TAG_NAME $HARBOR_REGISTRY/$IMAGE_NAME:latest
+                        podman push $HARBOR_REGISTRY/$IMAGE_NAME:latest --tls-verify=false
                     '''
                 }
             }
