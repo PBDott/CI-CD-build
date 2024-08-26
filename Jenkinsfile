@@ -14,7 +14,8 @@ pipeline {
     }
     environment {
         GIT_REPO = 'http://gitea-http.common.svc.cluster.local:3000/student/front-end-haho.git'
-        DOCKER_REGISTRY = 'harbor-potal.common.svc.cluster.local:80'
+        DOCKER_REGISTRY_PORTAL = 'harbor-portal.common.svc.cluster.local:80'
+        DOCKER_REGISTRY_CORE = 'harbor-core.common.svc.cluster.local:80'
         IMAGE_NAME = 'student/front-end-haho'
         HARBOR_USERNAME = 'student'
         HARBOR_PASSWORD = 'Okestro2018!'
@@ -42,8 +43,8 @@ pipeline {
             steps {
                 container('podman') {
                     sh '''
-                        echo "${HARBOR_PASSWORD}" | podman login $DOCKER_REGISTRY -u "$HARBOR_USERNAME" --password-stdin --tls-verify=false
-                        podman push --tls-verify=false $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME
+                        podman login $DOCKER_REGISTRY_PORTAL -u $HARBOR_USERNAME -p $HARBOR_PASSWORD --tls-verify=false
+                        podman push --tls-verify=false $DOCKER_REGISTRY_CORE/$IMAGE_NAME:$TAG_NAME
                     '''
                 }
             }
