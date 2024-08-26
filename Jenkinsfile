@@ -17,6 +17,7 @@ pipeline {
         DOCKER_REGISTRY_PORTAL = 'harbor-portal.common.svc.cluster.local:80'
         DOCKER_REGISTRY_CORE = 'harbor-core.common.svc.cluster.local:80'
         IMAGE_NAME = 'student/front-end-haho'
+        HARBOR_REGISTRY = 'harbor.okestro.io/front-end-haho'
         HARBOR_USERNAME = 'student'
         HARBOR_PASSWORD = 'Okestro2018!'
         BUILD_NUMBER = "${env.BUILD_NUMBER}"
@@ -44,7 +45,8 @@ pipeline {
                 container('podman') {
                     sh '''
                         podman login $DOCKER_REGISTRY_PORTAL -u $HARBOR_USERNAME -p $HARBOR_PASSWORD --tls-verify=false
-                        podman push $IMAGE_ID harbor.okestro.io/front-end-haho/$IMAGE_NAME:$TAG_NAME
+                        podman tag $DOCKER_REGISTRY_CORE/$IMAGE_NAME:$TAG_NAME $HARBOR_REGISTRY/$IMAGE_NAME:$TAG_NAME
+                        podman push $HARBOR_REGISTRY/$IMAGE_NAME:$TAG_NAME
                     '''
                 }
             }
@@ -54,8 +56,8 @@ pipeline {
             steps {
                 container('podman') {
                     sh '''
-                        podman tag $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME $DOCKER_REGISTRY/$IMAGE_NAME:latest
-                        podman push --tls-verify=false $DOCKER_REGISTRY/$IMAGE_NAME:latest
+                        podman tag $HARBOR_REGISTRY/$IMAGE_NAME:$TAG_NAME $HARBOR_REGISTRY/$IMAGE_NAME:latest
+                        podman push --tls-verify=false $HARBOR_REGISTRY/$IMAGE_NAME:latest
                     '''
                 }
             }
