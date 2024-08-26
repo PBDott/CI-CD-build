@@ -17,7 +17,7 @@ pipeline {
         DOCKER_REGISTRY_PORTAL = 'harbor-portal.common.svc.cluster.local:80'
         DOCKER_REGISTRY_CORE = 'harbor-core.common.svc.cluster.local:80'
         IMAGE_NAME = 'haho'
-        HARBOR_REGISTRY = 'harbor.okestro.io/front-end-haho'
+        HARBOR_REGISTRY = 'harbor-core.common.svc.cluster.local/front-end-haho'
         HARBOR_USERNAME = 'student'
         HARBOR_PASSWORD = 'Okestro2018!'
         BUILD_NUMBER = "${env.BUILD_NUMBER}"
