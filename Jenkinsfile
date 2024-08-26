@@ -34,7 +34,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 container('podman') {
-                    sh 'podman build -t $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME -f ./Dockerfile .'
+                    sh 'podman build -t $DOCKER_REGISTRY_CORE/$IMAGE_NAME:$TAG_NAME -f ./Dockerfile .'
                 }
             }
         }
