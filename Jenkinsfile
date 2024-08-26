@@ -49,7 +49,7 @@ pipeline {
                 container('podman') {
                     sh '''
                         podman login $DOCKER_REGISTRY_PORTAL -u $HARBOR_USERNAME -p $HARBOR_PASSWORD --tls-verify=false
-                        podman push $HARBOR_REGISTRY/$IMAGE_NAME:$TAG_NAME --tls-verify=false
+                        podman push $HARBOR_REGISTRY_CORE/$IMAGE_NAME:$TAG_NAME --tls-verify=false
                     '''
                 }
             }
