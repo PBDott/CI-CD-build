@@ -36,7 +36,6 @@ pipeline {
             steps {
                 container('podman') {
                     sh '''
-                        # 이미지 빌드 및 태그
                         podman build -t $DOCKER_REGISTRY_CORE/$IMAGE_NAME:$TAG_NAME -f ./Dockerfile .
                         podman tag $DOCKER_REGISTRY_CORE/$IMAGE_NAME:$TAG_NAME $HARBOR_REGISTRY/$IMAGE_NAME:$TAG_NAME
                     '''
@@ -44,12 +43,11 @@ pipeline {
             }
         }
 
-        stage('Push Docker Image to Harbor') {
+        stage('Harbor Login') {
             steps {
                 container('podman') {
                     sh '''
                         podman login $DOCKER_REGISTRY_PORTAL -u $HARBOR_USERNAME -p $HARBOR_PASSWORD --tls-verify=false
-                        podman push $HARBOR_REGISTRY_CORE/$IMAGE_NAME:$TAG_NAME --tls-verify=false
                     '''
                 }
             }
@@ -60,7 +58,7 @@ pipeline {
                 container('podman') {
                     sh '''
                         podman tag $HARBOR_REGISTRY/$IMAGE_NAME:$TAG_NAME $HARBOR_REGISTRY/$IMAGE_NAME:latest
-                        podman push $HARBOR_REGISTRY/$IMAGE_NAME:latest --tls-verify=false
+                        podman push $HARBOR_REGISTRY_CORE/$IMAGE_NAME:$TAG_NAME:latest --tls-verify=false
                     '''
                 }
             }
