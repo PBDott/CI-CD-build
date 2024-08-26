@@ -14,16 +14,25 @@ pipeline {
     }
     environment {
         GIT_REPO = 'http://gitea-http.common.svc.cluster.local:3000/student/front-end-haho.git'
-        DOCKER_REGISTRY_PORTAL = 'harbor-portal.common.svc.cluster.local:80'
-        DOCKER_REGISTRY_CORE = 'harbor-core.common.svc.cluster.local:80'
+        DOCKER_REGISTRY = 'harbor-core.common.svc.cluster.local'
         IMAGE_NAME = 'haho'
-        HARBOR_REGISTRY = 'harbor-core.common.svc.cluster.local/front-end-haho'
+        HARBOR_REGISTRY = 'front-end-haho'
         HARBOR_USERNAME = 'student'
         HARBOR_PASSWORD = 'Okestro2018!'
         BUILD_NUMBER = "${env.BUILD_NUMBER}"
         TAG_NAME = "SNAPSHOT-${BUILD_NUMBER}"
     }
     stages {
+        stage('Update DNS') {
+            steps {
+                container('podman') {
+                    sh '''
+                        echo "10.0.27.242 harbor.okestro.io" >> /etc/hosts
+                    '''
+                }
+            }
+        }
+
         stage('Clone Repository') {
             steps {
                 container('git') {
@@ -36,7 +45,7 @@ pipeline {
             steps {
                 container('podman') {
                     sh '''
-                        podman build -t $DOCKER_REGISTRY_CORE/$IMAGE_NAME:$TAG_NAME -f ./Dockerfile .
+                        podman build -t $DOCKER_REGISTRY/$IMAGE_NAME:$TAG_NAME -f ./Dockerfile .
                     '''
                 }
             }
@@ -46,7 +55,7 @@ pipeline {
             steps {
                 container('podman') {
                     sh '''
-                        podman login $DOCKER_REGISTRY_PORTAL -u $HARBOR_USERNAME -p $HARBOR_PASSWORD --tls-verify=false
+                        podman login $DOCKER_REGISTRY -u $HARBOR_USERNAME -p $HARBOR_PASSWORD --tls-verify=false
                     '''
                 }
             }
@@ -56,8 +65,8 @@ pipeline {
             steps {
                 container('podman') {
                     sh '''
-                        podman tag $IMAGE_NAME:$TAG_NAME $HARBOR_REGISTRY/$IMAGE_NAME:$TAG_NAME
-                        podman push $HARBOR_REGISTRY/$IMAGE_NAME:$TAG_NAME --tls-verify=false
+                        podman tag $IMAGE_NAME:$TAG_NAME $DOCKER_REGISTRY/$HARBOR_REGISTRY/$IMAGE_NAME:$TAG_NAME
+                        podman push $DOCKER_REGISTRY/$HARBOR_REGISTRY/$IMAGE_NAME:$TAG_NAME --tls-verify=false
                     '''
                 }
             }
