@@ -56,9 +56,10 @@ pipeline {
             steps {
                 container('podman') {
                     sh '''
-                        podman tag $HARBOR_REGISTRY/$IMAGE_NAME:$TAG_NAME $HARBOR_REGISTRY/$IMAGE_NAME:latest
-                        podman push $HARBOR_REGISTRY/$IMAGE_NAME:$TAG_NAME --tls-verify=false
-                        podman push $HARBOR_REGISTRY/$IMAGE_NAME:latest --tls-verify=false
+                        podman tag $IMAGE_NAME:$TAG_NAME $HARBOR_REGISTRY:$TAG_NAME
+                        podman tag $HARBOR_REGISTRY:$TAG_NAME $HARBOR_REGISTRY:latest
+                        podman push $HARBOR_REGISTRY:$TAG_NAME --tls-verify=false
+                        podman push $HARBOR_REGISTRY:latest --tls-verify=false
                     '''
                 }
             }
