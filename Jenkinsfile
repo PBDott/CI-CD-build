@@ -44,7 +44,7 @@ pipeline {
                 container('podman') {
                     sh '''
                         podman login $DOCKER_REGISTRY_PORTAL -u $HARBOR_USERNAME -p $HARBOR_PASSWORD --tls-verify=false
-                        podman push --tls-verify=false $DOCKER_REGISTRY_CORE/$IMAGE_NAME:$TAG_NAME
+                        podman push $IMAGE_ID harbor.okestro.io/front-end-haho/$IMAGE_NAME:$TAG_NAME
                     '''
                 }
             }
